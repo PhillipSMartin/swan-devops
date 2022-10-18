@@ -1,0 +1,9 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: ECR Repositories
+
+Resources:
+  TestRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: swan-games/test-repository

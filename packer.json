@@ -1,0 +1,43 @@
+{
+    "variables": {
+      "aws_access_key_id": "{{env `AWS_ACCESS_KEY_ID`}}",
+      "aws_secret_access_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+      "aws_session_token": "{{env `AWS_SESSION_TOKEN`}}",
+      "timezone": "US/Eastern"
+    },
+    "builders": [
+      {
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key_id`}}",
+        "secret_key": "{{user `aws_secret_access_key`}}",
+        "token": "{{user `aws_session_token`}}",
+        "region": "us-east-2",
+        "source_ami": "ami-0b0033935e98632de",
+        "instance_type": "t2.micro",
+        "ssh_username": "ec2-user",
+        "associate_public_ip_address": "true",
+        "ami_name": "swangames-ecs {{timestamp}}",
+        "tags": {
+          "Name": "Swan Games ECS Base Image 2022.10.a",
+          "SourceAMI": "{{ .SourceAMI }}",
+          "DockerVersion": "20.10.17, build 100c701",
+          "ECSAgentVersion": "1.18.0"
+        }
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "inline": [
+          "sudo yum -y -x docker\\* -x ecs\\* update"
+        ] 
+      }
+    ],
+    "post-processors": [
+      {
+        "type": "manifest",
+        "output": "manifest.json",
+        "strip_path": true
+      }
+    ]
+  }
