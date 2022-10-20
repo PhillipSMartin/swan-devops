@@ -1,0 +1,39 @@
+*** To define a name profile ***
+
+~/.aws/credentials must contain sections for each named profile you want to use:
+
+    [dev]
+    aws_access_key_id = <your access key id>
+    aws_secret_access_key = <your secret access key>
+
+    [prod]
+    aws_access_key_id = <your access key id>
+    aws_secret_access_key = <your secret access key>
+
+~/.aws/config containes configuration parameters for each named profile
+
+    [profile dev]
+    source_profile=dev
+    region=us-east-2
+
+    [profile prod]
+    source_profile=prod
+    role_arn=arn:aws:iam::643787032379:role/admin
+    role_session_name=<your IAM name>
+    mfa_serial=<arn of your mfa device>
+    region=us-east-2
+
+prod profile is assumed to use mfa and to need to assue the admin role to perform necessary tasks
+
+to use prod profile, execute:
+    export AWS_PROFILE=prod
+
+*** To build an AMI for use by ECS ***
+
+execute:
+    export AWS_PROFILE=prod
+    make build
+
+Makefile contains instructions to assume the admin role and to  call packer to build using the commands in packer.json
+This will create and image with the name "swangames-ecs {timestamp}"
+The timezone is a varaible at the start of the packer.json file and defaults to "America/New_York" 
