@@ -73,9 +73,9 @@ EOF
 #sudo service docker start
 #sudo start ecs
 
-sudo systemctl start awslogs 
-sudo systemctl enable docker
-sudo systemctl start docker
+sudo systemctl start awslogsd 
+sudo systemctl enable docker.service docker.socket
+sudo systemctl start docker.service docker.socket
 sudo systemctl start ecs
 
 # Health check
