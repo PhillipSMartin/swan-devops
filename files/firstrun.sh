@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# Configure ECS Agent
-echo "ECS_CLUSTER=${ECS_CLUSTER}" > /etc/ecs/ecs.config
-
 # Set HTTP Proxy URL if provided
 if [ -n $PROXY_URL ]
 then
@@ -67,22 +64,12 @@ datetime_format = %Y-%m-%dT%H:%M:%SZ
 time_zone = UTC
 EOF
 
-# Start services
-#sudo service awslogs start
-#sudo chkconfig docker on
-#sudo service docker start
-#sudo start ecs
-
-sudo systemctl start awslogsd 
-sudo systemctl enable docker.service docker.socket
-sudo systemctl start docker.service docker.socket
-sudo systemctl start ecs
-
-# Health check
+# Health check - doesn't work here - ECS service is stopped and can't restart it in this script
 # Loop until ECS agent has registered to ECS cluster
-echo "Checking ECS agent is joined to ${ECS_CLUSTER}"
-until [[ "$(curl --fail --silent http://localhost:51678/v1/metadata | jq '.Cluster // empty' -r -e)" == ${ECS_CLUSTER} ]]
-  do printf '.'
-  sleep 5
-done
-echo "ECS agent successfully joined to ${ECS_CLUSTER}"
+
+#echo "Checking ECS agent is joined to ${ECS_CLUSTER}" 
+#until [[ "$(curl --fail --silent http://localhost:51678/v1/metadata | jq '.Cluster // empty' -r -e)" == ${ECS_CLUSTER} ]]
+ # do printf '.'
+ # sleep 5
+#done
+#echo "ECS agent successfully joined to ${ECS_CLUSTER}"

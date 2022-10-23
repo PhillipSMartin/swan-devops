@@ -15,6 +15,15 @@ Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: Target VPC
+  ClusterName:
+    Type: String
+    Description: Name of ECS Cluster
+  AutoScalingGroupName:
+    Type: String
+    Description: Name of AutoScalingGroup
+  KeyPair:
+    Type: String
+    Description: Public/Private Keypair for SSH
 
 Resources:
   ApplicationAutoscalingSecurityGroup:
@@ -92,7 +101,7 @@ Resources:
   ApplicationCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: test-cluster
+      ClusterName: !Ref ClusterName
   ApplicationAutoscalingLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
@@ -104,31 +113,33 @@ Resources:
             06_public_volume_permissions:
               command: chown -R 1000:1000 /data/public
             10_first_run:
-              command: sh firstrun.sh
+              command: sh firstrun.sh > firstrun.log 2>&1
               cwd: /home/ec2-user
               env:
-                ECS_CLUSTER: !Ref ApplicationCluster
+                ECS_CLUSTER: !Ref ClusterName
                 STACK_NAME: !Ref AWS::StackName
-                AUTOSCALING_GROUP: ApplicationAutoscaling
+                AUTOSCALING_GROUP: !Ref AutoScalingGroupName
                 AWS_DEFAULT_REGION: !Ref AWS::Region
     Properties:
       ImageId: !Ref ApplicationImageId
       InstanceType: t2.micro
-      KeyName: Phillip-prod-key-pair
+      KeyName: !Ref KeyPair
       IamInstanceProfile: !Ref ApplicationAutoscalingInstanceProfile
       SecurityGroups:
         - !Ref ApplicationAutoscalingSecurityGroup
       UserData:
         Fn::Base64:
-          Fn::Sub: |
+          Fn::Sub:
+          - |
             #!/bin/bash
-            systemctl stop docker.service docker.socket
+            echo "ECS_CLUSTER=${cluster_name}" > /etc/ecs/ecs.config
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} \
               --resource ApplicationAutoscalingLaunchConfiguration \
               --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} \
               --resource ApplicationAutoscaling \
               --region ${AWS::Region}
+          - cluster_name: !Ref ClusterName
   ApplicationAutoscaling:
     Type: AWS::AutoScaling::AutoScalingGroup
     CreationPolicy:
@@ -139,6 +150,7 @@ Resources:
       LaunchConfigurationName: !Ref ApplicationAutoscalingLaunchConfiguration
       MinSize: 0
       MaxSize: 4
+      AutoScalingGroupName: !Ref AutoScalingGroupName
       DesiredCapacity: !Ref ApplicationDesiredCount
       VPCZoneIdentifier: !Ref ApplicationSubnets
       Tags:

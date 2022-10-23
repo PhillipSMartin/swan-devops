@@ -26,7 +26,7 @@
             }
         ],
         "tags": {
-          "Name": "Swan Games ECS Base Image 2022.10.a",
+          "Name": "Swan Games ECS Base Image 2022.10a",
           "SourceAMI": "{{ .SourceAMI }}",
           "DockerVersion": "20.10.13",
           "ECSAgentVersion": "1.64.0"
