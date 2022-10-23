@@ -37,3 +37,18 @@ execute:
 Makefile contains instructions to assume the admin role and to  call packer to build using the commands in packer.json
 This will create and image with the name "swangames-ecs {timestamp}"
 The timezone is a varaible at the start of the packer.json file and defaults to "America/New_York" 
+
+*** To build an ECS Cluster using a CloudFormation stack ***
+
+change any parameters you need to change in the dev.cfg file:
+    ApplicationDesiredCount=1
+    ApplicationImageId=ami-0b236d078111a0ec8
+    ApplicationSubnets=subnet-0b2bf8ae8fc388d5e,subnet-0299aa346bdba97e7
+    VpcId=vpc-0e81de7ad37fbc96d
+    ClusterName=test-ECS-cluster
+    AutoScalingGroupName=test-ECS-autoscalinggroup
+    KeyPair=Phillip-prod-key-pair
+
+execute:
+    export AWS_PROFILE=prod
+    aws cloudformation deploy --template-file stack.yml --stack-name test-stack --parameter-overrides $(cat dev.cfg) --capabilities CAPABILITY_NAMED_IAM
