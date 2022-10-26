@@ -83,4 +83,21 @@ Resources:
     Properties:
       Domain: vpc
 
+# Export Private Subnets
+Outputs:
+  SubnetA:
+    Description: Private subnet in AZ a
+    Value: !Ref PrivateSubnetA
+    Export:
+      Name: private-subnet-a
+  ubnetB:
+    Description: Private subnet in AZ b
+    Value: !Ref PrivateSubnetB
+    Export:
+      Name: private-subnet-b
+  SubnetC:
+    Description: Private subnet in AZ c
+    Value: !Ref PrivateSubnetC
+    Export:
+      Name: private-subnet-c
     
