@@ -9,7 +9,7 @@ Parameters:
   ApplicationImageId:
     Type: String
     Description: ECS Amazon Machine Image (AMI) Id
-  ApplicationSubnets:
+  PublicSubnets:
     Type: List<AWS::EC2::Subnet::Id>
     Description: Target subnets for EC2 instances
   VpcId:
@@ -391,7 +391,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Scheme: internet-facing
-      Subnets: !Ref ApplicationSubnets
+      Subnets: !Ref PublicSubnets
       SecurityGroups:
         - !Ref ApplicationLoadBalancerSecurityGroup
       LoadBalancerAttributes:
@@ -453,7 +453,7 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Application Database Subnet Group
-      SubnetIds: !Ref ApplicationSubnets
+      SubnetIds: !Ref PublicSubnets
       Tags:
         - Key: Name
           Value: !Sub ${AWS::StackName}-db-subnet-group
@@ -612,7 +612,7 @@ Resources:
       MaxSize: 4
       AutoScalingGroupName: !Sub ${AWS::StackName}-autoscaling-group
       DesiredCapacity: !Ref ApplicationDesiredCount
-      VPCZoneIdentifier: !Ref ApplicationSubnets
+      VPCZoneIdentifier: !Ref PublicSubnets
       Tags:
         - Key: Name
           Value: !Sub ${AWS::StackName}-ApplicationAutoscaling-instance
