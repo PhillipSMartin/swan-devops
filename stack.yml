@@ -606,6 +606,12 @@ Resources:
       ResourceSignal:
         Count: !Ref ApplicationDesiredCount
         Timeout: PT15M
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MinInstancesInService: !Ref ApplicationDesiredCount
+        MinSuccessfulInstancesPercent: 100
+        WaitOnResourceSignals: "true"
+        PauseTime: PT15M
     Properties:
       LaunchConfigurationName: !Ref ApplicationAutoscalingLaunchConfiguration
       MinSize: 0
