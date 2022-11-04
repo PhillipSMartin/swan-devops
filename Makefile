@@ -1,4 +1,4 @@
-.PHONY: build
+.PHONY: build deploy
 .ONESHELL:
 
 build:
@@ -17,3 +17,10 @@ define assume_role
       ]" \
     --output text)
 endef
+
+deploy:
+  export AWS_PROFILE=prod
+  #aws cloudformation deploy --template-file stack.yml --stack-name test-stack --parameter-overrides $(cat dev.cfg) --capabilities CAPABILITY_NAMED_IAM
+  aws cloudformation deploy --template-file stack.yml --stack-name test-stack --parameter-overrides \
+    $(cat dev.json | jq -r '.Parameters|to_entries[]|.key+"="+.value') --capabilities CAPABILITY_NAMED_IAM
+

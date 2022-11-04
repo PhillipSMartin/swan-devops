@@ -3,6 +3,22 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: ECR Repositories
 
 Resources:
+  CodebuildRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: swan-games/test-codebuild
+      RepositoryPolicyText:
+        Version: '2008-10-17'
+        Statement:
+        - Sid: RemoteAccountAccess
+          Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::643787032379:root
+            Service: codebuild.amazonaws.com
+          Action:
+          - ecr:GetDownloadUrlForLayer
+          - ecr:BatchGetImage
+          - ecr:BatchCheckLayerAvailability
   TestRepository:
     Type: AWS::ECR::Repository
     Properties:

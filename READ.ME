@@ -10,7 +10,7 @@
     aws_access_key_id = <your access key id>
     aws_secret_access_key = <your secret access key>
 
-~/.aws/config containes configuration parameters for each named profile
+~/.aws/config contains configuration parameters for each named profile
 
     [profile dev]
     source_profile=dev
@@ -49,6 +49,17 @@ change any parameters you need to change in the dev.cfg file:
     AutoScalingGroupName=test-ECS-autoscalinggroup
     KeyPair=Phillip-prod-key-pair
 
+then run
+    make deploy
+ 
+
+*** To create an ECR repository ***
+
+modify ecr.yml
+
 execute:
-    export AWS_PROFILE=prod
-    aws cloudformation deploy --template-file stack.yml --stack-name test-stack --parameter-overrides $(cat dev.cfg) --capabilities CAPABILITY_NAMED_IAM
+    export AWS_PROFILE=dev
+    aws cloudformation deploy --template-file ecr.yml --stack-name ecr-repositories
+    docker tag <local image name> <fully qualified name of new repository>
+    eval $(aws ecr get-login --no-include-email)
+    docker push <fully qualified name of new repository>
